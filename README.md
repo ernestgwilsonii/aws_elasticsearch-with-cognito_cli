@@ -178,12 +178,19 @@ aws iam get-role --role-name ChatOps_Elastisearch_Cognito_Role
 # Working create Elasticsearch example!
 aws es create-elasticsearch-domain --domain-name chatops \
         --region us-east-1 \
-        --access-policies "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:sts::XXXXXXXXXXXX:assumed-role/ChatOps_Elastisearch_Cognito_Role/CognitoIdentityCredentials\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:XXXXXXXXXXXX:domain/chatops/*\"}]}" \
+        --access-policies '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Auth_Role"},"Action":"es:*","Resource":"arn:aws:es:us-east-1:XXXXXXXXXXXX:domain/chatops/*"}]}' \
         --elasticsearch-version "6.3" \
         --elasticsearch-cluster-config InstanceType=t2.small.elasticsearch,InstanceCount=1 \
         --ebs-options EBSEnabled=true,VolumeSize=10 \
         --cognito-options Enabled=true,UserPoolId="us-east-1_YOURUSERPOOLIDHERE",IdentityPoolId="us-east-1:YOURIDENTITYPOOLIDHERE",RoleArn="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Elastisearch_Cognito_Role"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/es/create-elasticsearch-domain.html
+
+
+# After the Elasticsearch domain cluster is online, you may update the policy at anytime
+#aws es update-elasticsearch-domain-config --domain-name chatops \
+--access-policies '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Auth_Role"},"Action":"es:*","Resource":"arn:aws:es:us-east-1:XXXXXXXXXXXX:domain/chatops/*"}]}'
+# REF: https://docs.aws.amazon.com/cli/latest/reference/es/update-elasticsearch-domain-config.html
+
 
 # Delete Elasticsearch
 #aws es list-domain-names
