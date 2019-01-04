@@ -97,18 +97,24 @@ aws cognito-identity create-identity-pool \
 
 # Create IAM Role for Cognito Authenticated
 ###########################################
-aws iam create-role --role-name ChatOps_Cognito_Auth_Role --assume-role-policy-document file://ChatOps_Cognito_Identity_Pool_Auth_Assume_Role_Policy.json
+aws iam create-role --role-name ChatOps_Cognito_Auth_Role \
+        --assume-role-policy-document file://ChatOps_Cognito_Identity_Pool_Auth_Assume_Role_Policy.json
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/create-role.html
 # Put an inline policy on the role:
-aws iam put-role-policy --role-name ChatOps_Cognito_Auth_Role --policy-name ChatOps_Cognito_Auth_Role_Inline_Policy --policy-document file://ChatOps_Cognito_Identity_Pool_Auth_Attach_Role_Policy.json
+aws iam put-role-policy --role-name ChatOps_Cognito_Auth_Role \
+        --policy-name ChatOps_Cognito_Auth_Role_Inline_Policy \
+        --policy-document file://ChatOps_Cognito_Identity_Pool_Auth_Attach_Role_Policy.json
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/put-role-policy.html
 
 # Create IAM Role for Cognito Unauthenticated
 #############################################
-aws iam create-role --role-name ChatOps_Cognito_Unauth_Role --assume-role-policy-document file://ChatOps_Cognito_Identity_Pool_Unauth_Assume_Role_Policy.json
+aws iam create-role --role-name ChatOps_Cognito_Unauth_Role \
+        --assume-role-policy-document file://ChatOps_Cognito_Identity_Pool_Unauth_Assume_Role_Policy.json
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/create-role.html
 # Put an inline policy on the role:
-aws iam put-role-policy --role-name ChatOps_Cognito_Unauth_Role --policy-name ChatOps_Cognito_Auth_Role_Inline_Policy --policy-document file://ChatOps_Cognito_Identity_Pool_Unauth_Attach_Role_Policy.json
+aws iam put-role-policy --role-name ChatOps_Cognito_Unauth_Role \
+        --policy-name ChatOps_Cognito_Auth_Role_Inline_Policy \
+        --policy-document file://ChatOps_Cognito_Identity_Pool_Unauth_Attach_Role_Policy.json
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/put-role-policy.html
 
 
@@ -121,7 +127,8 @@ aws iam get-role --role-name ChatOps_Cognito_Auth_Role
 # Get the Unauthenticated ARN
 aws iam get-role --role-name ChatOps_Cognito_Unauth_Role
 # Set Identity Pool Roles
-aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:YourIdentityPoolIdHere" --roles authenticated="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Auth_Role",unauthenticated="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Unauth_Role"
+aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:YourIdentityPoolIdHere" \
+    --roles authenticated="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Auth_Role",unauthenticated="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Cognito_Unauth_Role"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/set-identity-pool-roles.html
 #aws cognito-identity get-identity-pool-roles --identity-pool-id "us-east-1:YourIdentityPoolIdHere"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/get-identity-pool-roles.html
@@ -135,11 +142,13 @@ aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:YourI
 
 # Create your own role:
 # REF: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html
-aws iam create-role --role-name ChatOps_Elastisearch_Cognito_Role --assume-role-policy-document file://ChatOps-Elastisearch-Cognito-Role-Trust-Policy.json
+aws iam create-role --role-name ChatOps_Elastisearch_Cognito_Role \
+        --assume-role-policy-document file://ChatOps-Elastisearch-Cognito-Role-Trust-Policy.json
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/create-role.html
 
 # Attach an AWS supplied "AWS Managed Policy" (AmazonESCognitoAccess) to your IAM Role
-aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonESCognitoAccess --role-name ChatOps_Elastisearch_Cognito_Role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonESCognitoAccess \
+        --role-name ChatOps_Elastisearch_Cognito_Role
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/attach-role-policy.html
 ```
 
@@ -169,7 +178,7 @@ aws iam get-role --role-name ChatOps_Elastisearch_Cognito_Role
 # Working create Elasticsearch example!
 aws es create-elasticsearch-domain --domain-name chatops \
         --region us-east-1 \
-        --access-policies "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:sts::XXXXXXXXXXXX:assumed-role/Cognito_Chatops_Cognito_Identity_PoolAuth_Role/CognitoIdentityCredentials\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:XXXXXXXXXXXX:domain/chatops/*\"}]}" \
+        --access-policies "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:sts::XXXXXXXXXXXX:assumed-role/ChatOps_Elastisearch_Cognito_Role/CognitoIdentityCredentials\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:XXXXXXXXXXXX:domain/chatops/*\"}]}" \
         --elasticsearch-version "6.3" \
         --elasticsearch-cluster-config InstanceType=t2.small.elasticsearch,InstanceCount=1 \
         --ebs-options EBSEnabled=true,VolumeSize=10 \
@@ -187,6 +196,8 @@ aws es delete-elasticsearch-domain --domain-name chatops
 ## Create a Kibana user in Cognito
 ##### Blah
 ```
+# AWS Console --> Cognito --> Manage User Pools --> ChatOps_Cognito_User_Pool --> General settings --> User and groups --> Create user
+# AWS CLI:
 TBD
 ```
 
@@ -194,5 +205,7 @@ TBD
 ## Log in to Kibana
 ##### Blah
 ```
+# AWS Console --> Elasticsearch --> My domains --> chatops --> Overview (tab) --> Kibana (click link)
+# AWS CLI:
 TBD
 ```
