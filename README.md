@@ -158,18 +158,24 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonESCognitoA
 ```
 # AWS CLI to get the UserPoolId:
 aws cognito-idp list-user-pools --max-results=60
+#aws cognito-idp list-user-pools --max-results=60 | jq .UserPools[0].Id | sed s/\"//g
 # REF: https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/index.html#cli-aws-cognito-idp
 #aws cognito-idp describe-user-pool --user-pool-id "us-east-1_YourUserPoolIdHere"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/describe-user-pool.html
 
 # AWS CLI to get the IdentityPoolId:
 aws cognito-identity list-identity-pools --max-results=60
+#aws cognito-identity list-identity-pools --max-results=60 | jq .IdentityPools[0].IdentityPoolId | sed s/\"//g
 #aws cognito-identity describe-identity-pool --identity-pool-id "us-east-1:YourIdentityPoolIdHere"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/index.html#cli-aws-cognito-identity
 
 # AWS CLI to get the RoleArn:
 aws iam get-role --role-name ChatOps_Elastisearch_Cognito_Role
+#aws iam get-role --role-name ChatOps_Elastisearch_Cognito_Role | jq .Role.Arn | sed s/\"//g
 # REF: https://docs.aws.amazon.com/cli/latest/reference/iam/get-role.html
+
+# AWS CLI to get account number
+aws sts get-caller-identity --output text --query 'Account'
 ```
 
 
@@ -185,6 +191,11 @@ aws es create-elasticsearch-domain --domain-name chatops \
         --cognito-options Enabled=true,UserPoolId="us-east-1_YOURUSERPOOLIDHERE",IdentityPoolId="us-east-1:YOURIDENTITYPOOLIDHERE",RoleArn="arn:aws:iam::XXXXXXXXXXXX:role/ChatOps_Elastisearch_Cognito_Role"
 # REF: https://docs.aws.amazon.com/cli/latest/reference/es/create-elasticsearch-domain.html
 
+
+# After the Elasticsearch domain cluster is online, you need to use the CLI to include Cognito
+aws es update-elasticsearch-domain-config --domain-name chatops \
+--cognito-options '{"Enabled":true,"UserPoolId":"us-east-1_858LFobPn","IdentityPoolId":"us-east-1:495bf4b0-982b-4b5b-978d-86f7fe6f0927","RoleArn":"arn:aws:iam::511364101674:role/ChatOps_Elastisearch_Cognito_Role"}'
+# REF: https://docs.aws.amazon.com/cli/latest/reference/es/update-elasticsearch-domain-config.html
 
 # After the Elasticsearch domain cluster is online, you may update the policy at anytime
 #aws es update-elasticsearch-domain-config --domain-name chatops \
